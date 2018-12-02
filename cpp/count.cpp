@@ -21,10 +21,10 @@ void writeResultToFiles(map<string, int> words)
     result.close();
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     ifstream file;
-    file.open("1513-0.txt");
+    file.open(argv[1]);
     if (!file.is_open())
         return 1;
     map<string, int> words;
