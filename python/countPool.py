@@ -3,7 +3,6 @@ import json
 import sys
 import time
 import multiprocessing
-import numpy
 from collections import Counter
 
 process_queue = multiprocessing.Queue()

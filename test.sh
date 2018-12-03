@@ -10,7 +10,7 @@ do
 done
 
 cd python 
-python countPool.py temp.txt temp.txt temp.txt temp.txt temp.txt temp.txt temp.txt 
+python countPool.py temp.txt temp.txt temp.txt temp.txt temp.txt temp.txt temp.txt temp.txt temp.txt temp.txt 
 
 # remove the tmp file
 rm temp.txt
