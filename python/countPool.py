@@ -14,29 +14,36 @@ def count(filepath):
     print"Counting Word Occurence in file {}".format(filepath)
     local_counts = {}
     with open(filepath, 'r') as f:
-        
-        words = [word.strip() for word in f.read().split()]
+        # create list of words that are alphanumerci only
+        words = [word.strip() for word in f.read().split() if word.isalpha()]
         for word in words:
-            if word not in local_counts:
-                local_counts[word] = 0
-            local_counts[word] += 1
+            lowercase_word = word.lower()
+            if lowercase_word not in local_counts:
+                local_counts[lowercase_word] = 0
+            local_counts[lowercase_word] += 1
     return local_counts
 
 def writeToFile(result):
-    with open('result.json', 'a+') as result_file:
-        json.dump(format(result), result_file)
+    with open('result.json', 'w+') as result_file:
+        # dump sorted result in data
+        json.dump(sorted(result.iteritems()), result_file)
 
 def mapCallback(result):
-    print result
+    print "done"
 
 def main():
 
     # utilizing half the available cores on the machine
     pool = multiprocessing.Pool(multiprocessing.cpu_count()/2)
 
-    result = pool.map_async(count, sys.argv[1:len(sys.argv)], callback=writeToFile)    
+    result = pool.map_async(count, sys.argv[1:len(sys.argv)], callback=mapCallback)    
     result.wait()
-    # dict(Counter(curated_results[1])+Counter(curated_results[2]))
+
+    counter = Counter()
+    for data in result.get():
+        counter.update(data)
+
+    writeToFile(dict(counter))
 
     pool.close()
     pool.terminate()

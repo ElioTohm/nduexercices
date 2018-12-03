@@ -7,7 +7,7 @@ def count(resultqueue, filepath):
     print("Counting Word Occurence in file " + filepath)
     local_counts = {}
     with open(filepath, 'r') as f:
-        words = [word.strip() for word in f.read().split()]
+        words = [word.strip() for word in f.read().split() if word.isalpha() or word == "'"]
 
         for word in words:
             if word not in local_counts:
