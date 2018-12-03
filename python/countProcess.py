@@ -1,32 +1,40 @@
+import json
+import sys
 import multiprocessing
+from collections import Counter
 
-def runmycode(result_queue, iterations):
-   print("Requested...")
-   while 1==1: # This is an infinite loop, so I assume you want something else here
-       with iterations.get_lock(): # Need a lock because incrementing isn't atomic
-           iterations.value += 1
-   if "result found (for example)":
-       result_queue.put("result!")
+def count(resultqueue, filepath):
+    print("Counting Word Occurence in file " + filepath)
+    local_counts = {}
+    with open(filepath, 'r') as f:
+        words = [word.strip() for word in f.read().split()]
 
-   print("Done")
+        for word in words:
+            if word not in local_counts:
+                local_counts[word] = 0
+            local_counts[word] += 1
+    result_queue.put(local_counts)
 
+def writeToFile(result):
+    with open('result.json', 'a+') as result_file:
+        json.dump(format(result), result_file)
 
 if __name__ == "__main__":
-    processs = []
+    jobs = []
     result_queue = multiprocessing.Queue()
-
-    iterations = multiprocessing.Value('i', 0)
-    for n in range(4): # start 4 processes
-        process = multiprocessing.Process(target=runmycode, args=(result_queue, iterations))
+    
+    for n in range(1, len(sys.argv)):
+        process = multiprocessing.Process(target=count, args=(result_queue, sys.argv[n]))            
         process.start()
-        processs.append(process)
+        jobs.append(process)
+
 
     print("Waiting for result...")
 
     result = result_queue.get() # wait
 
-    for process in processs: # then kill them all off
+    writeToFile(result)
+    
+    for process in jobs: # then kill them all off
         process.terminate()
 
-    print("Got result: {}".format(result))
-    print("Total iterations {}".format(iterations.value))
