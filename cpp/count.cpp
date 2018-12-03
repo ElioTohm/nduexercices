@@ -2,8 +2,8 @@
 #include <string>
 #include <map>
 #include <fstream>
+#include <pthread.h>
 using namespace std;
-
 
 /**
  * In the assi we need to read and write to a file therefore we user the iostream and fstream 
@@ -21,10 +21,11 @@ void writeResultToFiles(map<string, int> words)
     result.close();
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
+
     ifstream file;
-    file.open(argv[1]);
+    file.open(argv[2]);
     if (!file.is_open())
         return 1;
     map<string, int> words;
