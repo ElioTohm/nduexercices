@@ -33,8 +33,8 @@ def mapCallback(result):
 
 def main():
 
-    # utilizing half the available cores on the machine
-    pool = multiprocessing.Pool(multiprocessing.cpu_count()/2)
+    # utilizing half the available cores on the machine end set max threads perchild to limit memory use
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count()/2, maxtasksperchild=1000)
 
     result = pool.map_async(count, sys.argv[1:len(sys.argv)], callback=mapCallback)    
     result.wait()
