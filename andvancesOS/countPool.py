@@ -1,15 +1,21 @@
 #! python
+"""
+    this example we are loading the hole files into memory 
+    each file will be used in a process and will be handle by the multiprocessing library in python 
+    this example is using pool to show the queue handling of tasks on the process
+
+"""
 import json
 import sys
 import time
 import multiprocessing
 from collections import Counter
 
-process_queue = multiprocessing.Queue()
 result = {}
 curated_results = {}
 
-def count(filepath):
+# map file to list of words and use dictionary to map words to count
+def mapper(filepath):
     print"Counting Word Occurence in file {}".format(filepath)
     local_counts = {}
     with open(filepath, 'r') as f:
@@ -22,6 +28,13 @@ def count(filepath):
             local_counts[lowercase_word] += 1
     return local_counts
 
+# reducer counts array of dictionary
+def reducer(result):
+    counter = Counter()
+    for data in result:
+        counter.update(data)
+    return dict(counter)
+
 def writeToFile(result):
     with open('result.json', 'w+') as result_file:
         # dump sorted result in data
@@ -31,19 +44,13 @@ def mapCallback(result):
     print "done"
 
 def main():
-
-    # utilizing half the available cores on the machine end set max threads perchild to limit memory use
-    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count()/2, maxtasksperchild=1000)
-
-    result = pool.map_async(count, sys.argv[1:len(sys.argv)], callback=mapCallback)    
-    result.wait()
-
-    counter = Counter()
-    for data in result.get():
-        counter.update(data)
-
-    writeToFile(dict(counter))
-
+    # utilizing all - 2 of the available cores on the machine end set max threads perchild to limit memory use
+    pool = multiprocessing.Pool(processes=(multiprocessing.cpu_count())-2, maxtasksperchild=1000)
+    # using pool to handle individual files in 1 process
+    result = pool.map_async(mapper, sys.argv[1:len(sys.argv)], callback=mapCallback)    
+    # reduce and write result to files
+    writeToFile(reducer(result.get()))
+    # close pool and terminate
     pool.close()
     pool.terminate()
 

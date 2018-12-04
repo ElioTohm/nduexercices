@@ -1,0 +1,9 @@
+version: "3"
+
+services: 
+  multiProcess:
+    image: python:2.7
+    working_dir: /code
+    volumes: 
+      - .:/code
+    command: 'python countPoolMemRest.py temp.txt ' 

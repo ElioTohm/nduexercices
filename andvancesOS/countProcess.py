@@ -1,3 +1,7 @@
+#! python
+"""
+    simple multi processing test first attempt
+"""
 import json
 import sys
 import multiprocessing
